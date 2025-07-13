@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot Card Reader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #e2e8f0; /* Light text color */
+        }
+        .container {
+            background-color: #2d3748; /* Slightly lighter dark background for container */
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            border: 1px solid #4a5568;
+        }
+        h1 {
+            color: #9f7aea; /* Purple heading */
+        }
+        .card-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .card-image-wrapper {
+            width: 250px; /* Fixed width for the card image */
+            height: 400px; /* Fixed height for the card image */
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 3px solid #6b46c1; /* Purple border */
+            background-color: #4a5568; /* Placeholder background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
+            border-radius: 8px; /* Slightly smaller border radius for inner image */
+        }
+        .card-details {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .card-name {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            color: #81e6d9; /* Teal color for card name */
+            margin-bottom: 10px;
+        }
+        .card-meaning {
+            font-size: 1.125rem; /* text-lg */
+            color: #cbd5e0; /* Light gray for meaning */
+            line-height: 1.6;
+        }
+        button {
+            background-color: #9f7aea; /* Purple button */
+            color: #ffffff;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.4);
+            letter-spacing: 0.05em;
+        }
+        button:hover {
+            background-color: #805ad5; /* Darker purple on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(159, 122, 234, 0.6);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.4);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px;
+                gap: 20px;
+            }
+            h1 {
+                font-size: 2rem; /* text-2xl */
+            }
+            .card-image-wrapper {
+                width: 200px;
+                height: 320px;
+            }
+            .card-name {
+                font-size: 1.5rem; /* text-2xl */
+            }
+            .card-meaning {
+                font-size: 1rem; /* text-base */
+            }
+            button {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-extrabold">Tarot Card Reader</h1>
+
+        <div class="card-display">
+            <div class="card-image-wrapper">
+                <img id="cardImage" class="card-image" src="" alt="Tarot Card">
+            </div>
+            <div class="card-details">
+                <h2 id="cardName" class="card-name"></h2>
+                <p id="cardMeaning" class="card-meaning"></p>
+            </div>
+        </div>
+
+        <button id="drawCardButton">Draw a Card</button>
+    </div>
+
+    <script>
+        // Array of Tarot card data
+        // IMPORTANT: Replace the 'imageUrl' values with direct links to your own JPG/PNG images.
+        // You can use services like Imgur, GitHub Pages, or your own web server to host images.
+        const tarotCards = [
+            {
+                name: "The Fool",
+                imageUrl: "https://placehold.co/250x400/9f7aea/ffffff?text=The+Fool",
+                meaning: "The Fool represents new beginnings, innocence, spontaneity, and a free spirit. It suggests embarking on a new journey with an open heart and mind, trusting in the universe. It can also signify taking a leap of faith or a journey into the unknown."
+            },
+            {
+                name: "The Magician",
+                imageUrl: "https://placehold.co/250x400/81e6d9/000000?text=The+Magician",
+                meaning: "The Magician symbolizes power, skill, concentration, action, and resourcefulness. It suggests that you have all the tools you need to manifest your desires and bring your ideas into reality."
+            },
+            {
+                name: "The High Priestess",
+                imageUrl: "https://placehold.co/250x400/f6ad55/000000?text=The+High+Priestess",
+                meaning: "The High Priestess represents intuition, subconscious, mystery, spiritual enlightenment, and inner wisdom. It encourages you to listen to your inner voice and trust your instincts."
+            },
+            {
+                name: "The Empress",
+                imageUrl: "https://placehold.co/250x400/fc8181/000000?text=The+Empress",
+                meaning: "The Empress signifies fertility, nurturing, beauty, creativity, and abundance. It often represents a connection to nature and the feminine principle, encouraging growth and creation."
+            },
+            {
+                name: "The Emperor",
+                imageUrl: "https://placehold.co/250x400/63b3ed/000000?text=The+Emperor",
+                meaning: "The Emperor embodies authority, structure, control, fatherhood, and stability. It suggests the need for discipline, order, and leadership in your life."
+            },
+            {
+                name: "The Hierophant",
+                imageUrl: "https://placehold.co/250x400/fbd38d/000000?text=The+Hierophant",
+                meaning: "The Hierophant represents tradition, conventional beliefs, spiritual guidance, conformity, and institutions. It can indicate seeking wisdom from established sources or adhering to traditional values."
+            },
+            {
+                name: "The Lovers",
+                imageUrl: "https://placehold.co/250x400/a3bfb0/000000?text=The+Lovers",
+                meaning: "The Lovers symbolize love, relationships, harmony, choice, and alignment of values. It often points to significant decisions regarding partnerships or a deep connection with another."
+            },
+            {
+                name: "The Chariot",
+                imageUrl: "https://placehold.co/250x400/b794f4/000000?text=The+Chariot",
+                meaning: "The Chariot signifies victory, willpower, determination, control, and self-discipline. It suggests moving forward with confidence and overcoming obstacles through focused effort."
+            },
+            {
+                name: "Strength",
+                imageUrl: "https://placehold.co/250x400/c53030/ffffff?text=Strength",
+                meaning: "Strength represents courage, inner strength, compassion, patience, and gentle influence. It's about mastering your primal instincts with kindness and perseverance."
+            },
+            {
+                name: "The Hermit",
+                imageUrl: "https://placehold.co/250x400/2c5282/ffffff?text=The+Hermit",
+                meaning: "The Hermit symbolizes introspection, solitude, self-reflection, spiritual guidance, and a search for truth. It suggests a period of withdrawal to gain wisdom and clarity."
+            },
+            {
+                name: "Wheel of Fortune",
+                imageUrl: "https://placehold.co/250x400/d69e2e/000000?text=Wheel+of+Fortune",
+                meaning: "The Wheel of Fortune represents cycles, destiny, turning points, good luck, and unexpected change. It indicates that fate is at play and things are about to shift."
+            },
+            {
+                name: "Justice",
+                imageUrl: "https://placehold.co/250x400/38a169/ffffff?text=Justice",
+                meaning: "Justice signifies fairness, truth, law, cause and effect, and objectivity. It calls for balance, integrity, and making decisions based on what is right and equitable."
+            },
+            {
+                name: "The Hanged Man",
+                imageUrl: "https://placehold.co/250x400/805ad5/ffffff?text=The+Hanged+Man",
+                meaning: "The Hanged Man represents sacrifice, new perspectives, surrender, suspension, and letting go. It suggests a need to pause, re-evaluate, and see things from a different angle."
+            },
+            {
+                name: "Death",
+                imageUrl: "https://placehold.co/250x400/4a5568/ffffff?text=Death",
+                meaning: "Death symbolizes transformation, endings, new beginnings, release, and transition. It rarely means physical death, but rather the end of a cycle to make way for renewal."
+            },
+            {
+                name: "Temperance",
+                imageUrl: "https://placehold.co/250x400/319795/ffffff?text=Temperance",
+                meaning: "Temperance signifies balance, moderation, harmony, patience, and purpose. It suggests blending different elements to create something new and finding a middle path."
+            },
+            {
+                name: "The Devil",
+                imageUrl: "https://placehold.co/250x400/718096/ffffff?text=The+Devil",
+                meaning: "The Devil represents addiction, materialism, bondage, shadow self, and temptation. It highlights areas where you might feel trapped or bound by unhealthy patterns."
+            },
+            {
+                name: "The Tower",
+                imageUrl: "https://placehold.co/250x400/c05621/ffffff?text=The+Tower",
+                meaning: "The Tower symbolizes sudden upheaval, destruction, revelation, and chaos. It indicates a sudden, unavoidable change that shatters old structures, leading to necessary transformation."
+            },
+            {
+                name: "The Star",
+                imageUrl: "https://placehold.co/250x400/4299e1/ffffff?text=The+Star",
+                meaning: "The Star represents hope, inspiration, serenity, spiritual connection, and renewal. It brings a sense of peace and optimism after a period of turmoil, guiding you towards your true self."
+            },
+            {
+                name: "The Moon",
+                imageUrl: "https://placehold.co/250x400/5a67d8/ffffff?text=The+Moon",
+                meaning: "The Moon signifies intuition, illusion, subconscious, dreams, and hidden truths. It suggests a time of uncertainty and confusion, where things may not be as they seem, urging you to trust your inner guidance."
+            },
+            {
+                name: "The Sun",
+                imageUrl: "https://placehold.co/250x400/ecc94b/000000?text=The+Sun",
+                meaning: "The Sun represents joy, success, vitality, optimism, and enlightenment. It brings warmth, clarity, and happiness, symbolizing a time of great positivity and achievement."
+            },
+            {
+                name: "Judgement",
+                imageUrl: "https://placehold.co/250x400/8b5cf6/ffffff?text=Judgement",
+                meaning: "Judgement symbolizes rebirth, inner calling, absolution, awakening, and evaluation. It suggests a time of reckoning and a call to higher purpose, often involving a major life decision or spiritual awakening."
+            },
+            {
+                name: "The World",
+                imageUrl: "https://placehold.co/250x400/38b2ac/ffffff?text=The+World",
+                meaning: "The World represents completion, accomplishment, integration, travel, and fulfillment. It signifies the successful conclusion of a major cycle and the achievement of wholeness and harmony."
+            }
+        ];
+
+        // Get references to HTML elements
+        const cardImage = document.getElementById('cardImage');
+        const cardName = document.getElementById('cardName');
+        const cardMeaning = document.getElementById('cardMeaning');
+        const drawCardButton = document.getElementById('drawCardButton');
+
+        /**
+         * Selects a random Tarot card from the tarotCards array.
+         * @returns {object} A random Tarot card object.
+         */
+        function getRandomCard() {
+            const randomIndex = Math.floor(Math.random() * tarotCards.length);
+            return tarotCards[randomIndex];
+        }
+
+        /**
+         * Displays the details of a given Tarot card on the page.
+         * @param {object} card - The Tarot card object to display.
+         */
+        function displayCard(card) {
+            cardImage.src = card.imageUrl;
+            cardImage.alt = card.name; // Set alt text for accessibility
+            cardName.textContent = card.name;
+            cardMeaning.textContent = card.meaning;
+        }
+
+        // Event listener for the "Draw a Card" button
+        drawCardButton.addEventListener('click', () => {
+            const drawnCard = getRandomCard();
+            displayCard(drawnCard);
+        });
+
+        // Initial card display when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialCard = getRandomCard();
+            displayCard(initialCard);
+        });
+    </script>
+</body>
+</html>
